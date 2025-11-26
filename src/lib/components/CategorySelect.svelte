@@ -41,8 +41,9 @@
 </script>
 
 <div class="category-select" bind:this={dropdownRef}>
-	<label class="label">Categories</label>
+	<label for="category-select-trigger" class="label">Categories</label>
 	<button
+		id="category-select-trigger"
 		type="button"
 		class="category-select__trigger input"
 		onclick={() => (isOpen = !isOpen)}
@@ -70,19 +71,20 @@
 				<div class="category-select__empty">No categories available</div>
 			{:else}
 				{#each categories as category}
-					<label
+					<div
 						class="category-select__option"
 						role="option"
 						aria-selected={selectedIds.includes(category.id)}
 					>
 						<input
 							type="checkbox"
+							id="category-{category.id}"
 							checked={selectedIds.includes(category.id)}
 							onchange={() => toggleCategory(category.id)}
 							class="category-select__checkbox"
 						/>
-						<span class="category-select__label">{category.name}</span>
-					</label>
+						<label for="category-{category.id}" class="category-select__label">{category.name}</label>
+					</div>
 				{/each}
 			{/if}
 		</div>

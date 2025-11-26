@@ -1,17 +1,12 @@
-import { dummyData } from '$lib/stores/dummy-data';
+import { categoriesApi } from '$lib/api/categories';
 import type { PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ params }) => {
-	const category = dummyData.categories.get(params.id);
-
-	if (!category) {
-		return {
-			category: null,
-			error: 'Category not found'
-		};
+export const load: PageServerLoad = async ({ params, fetch }) => {
+	try {
+		const category = await categoriesApi.get(fetch, params.id);
+		return { category };
+	} catch (e) {
+		throw error(404, 'Category not found');
 	}
-
-	return {
-		category
-	};
 };

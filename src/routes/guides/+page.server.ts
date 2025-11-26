@@ -1,7 +1,7 @@
-import { dummyData } from '$lib/stores/dummy-data';
+import { guidesApi } from '$lib/api/guides';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-	const guides = dummyData.guides.list();
+export const load: PageServerLoad = async ({ fetch }) => {
+	const guides = await guidesApi.list(fetch);
 	return { guides };
 };

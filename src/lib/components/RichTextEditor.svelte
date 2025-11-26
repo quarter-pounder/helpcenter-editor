@@ -8,9 +8,10 @@
 	interface Props {
 		value: GuideBody;
 		onUpdate: (body: GuideBody) => void;
+		onMarkdownChange?: (markdown: string) => void;
 	}
 
-	const { value, onUpdate }: Props = $props();
+	const { value, onUpdate, onMarkdownChange }: Props = $props();
 
 	let carta: Carta | null = $state(null);
 	let markdown = $state(blocksToMarkdown(value));
@@ -49,6 +50,12 @@
 		updateTimeout = setTimeout(() => {
 			onUpdate(markdownToBlocks(markdown));
 		}, 300);
+	});
+
+	$effect(() => {
+		if (onMarkdownChange) {
+			onMarkdownChange(markdown);
+		}
 	});
 </script>
 

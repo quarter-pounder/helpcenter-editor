@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { enhance } from '$app/forms';
 	import { resolvePath } from '$lib/utils/navigation';
-	import { dummyData } from '$lib/stores/dummy-data';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import CategorySelect from '$lib/components/CategorySelect.svelte';
 	import type { PageData } from './$types';
 	import type { GuideBody } from '$types/domain/guide';
+	import { markdownToBlocks } from '$lib/editor/convert';
 
 	const { data } = $props<{ data: PageData }>();
 	const categories = data.categories ?? [];
@@ -20,9 +20,10 @@
 		media_ids: [] as string[]
 	});
 
-let saving = $state(false);
-let error: string | null = $state(null);
-let slugManuallyEdited = $state(false);
+	let saving = $state(false);
+	let error: string | null = $state(null);
+	let slugManuallyEdited = $state(false);
+	let editorMarkdown = $state('');
 
 	function generateSlug(title: string): string {
 		return title
@@ -45,27 +46,27 @@ let slugManuallyEdited = $state(false);
 		formData.body = body;
 	}
 
-	async function handleSubmit() {
-		saving = true;
-		error = null;
-
-		try {
-			const guide = dummyData.guides.create({
-				title: formData.title,
-				slug: formData.slug,
-				body: formData.body,
-				estimatedReadTime: formData.estimated_read_time,
-				categoryIds: formData.category_ids,
-				mediaIds: formData.media_ids
-			});
-
-			goto(resolvePath(`/guides/${guide.id}`));
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'Failed to create guide';
-		} finally {
-			saving = false;
+	function validateForm(): boolean {
+		if (!formData.title.trim()) {
+			error = 'Title is required';
+			return false;
 		}
+		if (!formData.slug.trim()) {
+			error = 'Slug is required';
+			return false;
+		}
+
+		const currentBody = markdownToBlocks(editorMarkdown || '');
+		if (!currentBody.blocks || currentBody.blocks.length === 0) {
+			error = 'Content cannot be empty. Please add at least one paragraph, heading, or list.';
+			return false;
+		}
+
+		formData.body = currentBody;
+		return true;
 	}
+
+	let bodyInputValue = $derived(JSON.stringify(formData.body));
 </script>
 
 <svelte:head>
@@ -87,10 +88,22 @@ let slugManuallyEdited = $state(false);
 	{/if}
 
 	<form
+		method="POST"
 		class="grid gap-6"
-		onsubmit={(event) => {
-			event.preventDefault();
-			handleSubmit();
+		use:enhance={({ cancel }) => {
+			if (!validateForm()) {
+				cancel();
+				return;
+			}
+			saving = true;
+			error = null;
+			return async ({ result, update }) => {
+				await update();
+				saving = false;
+				if (result.type === 'failure') {
+					error = result.data?.error || 'Failed to create guide';
+				}
+			};
 		}}
 	>
 		<div class="grid gap-4">
@@ -98,6 +111,7 @@ let slugManuallyEdited = $state(false);
 				<label for="title" class="label">Title</label>
 				<input
 					id="title"
+					name="title"
 					type="text"
 					bind:value={formData.title}
 					onblur={handleTitleBlur}
@@ -111,6 +125,7 @@ let slugManuallyEdited = $state(false);
 					<label for="slug" class="label">Slug</label>
 					<input
 						id="slug"
+						name="slug"
 						type="text"
 						bind:value={formData.slug}
 						oninput={handleSlugInput}
@@ -123,6 +138,7 @@ let slugManuallyEdited = $state(false);
 					<label for="read-time" class="label">Estimated read time (minutes)</label>
 					<input
 						id="read-time"
+						name="estimated_read_time"
 						type="number"
 						min="1"
 						max="300"
@@ -142,9 +158,20 @@ let slugManuallyEdited = $state(false);
 		</div>
 
 		<div class="grid gap-3">
-			<label class="label">Content</label>
-			<RichTextEditor value={formData.body} onUpdate={handleBodyChange} />
+			<label for="content-editor" class="label">Content</label>
+			<div id="content-editor" role="textbox" aria-label="Content editor">
+				<RichTextEditor
+					value={formData.body}
+					onUpdate={handleBodyChange}
+					onMarkdownChange={(md) => (editorMarkdown = md)}
+				/>
+			</div>
 		</div>
+
+		<input type="hidden" name="body" value={bodyInputValue} />
+		<input type="hidden" name="category_ids" value={JSON.stringify(formData.category_ids)} />
+		<input type="hidden" name="media_ids" value={JSON.stringify(formData.media_ids)} />
+		<input type="hidden" name="editor_markdown" value={editorMarkdown} />
 
 		<div class="flex gap-4 flex-wrap">
 			<button type="submit" disabled={saving} class="btn variant-filled-primary">

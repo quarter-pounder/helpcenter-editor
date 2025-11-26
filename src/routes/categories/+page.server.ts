@@ -1,8 +1,8 @@
-import { dummyData } from '$lib/stores/dummy-data';
+import { categoriesApi } from '$lib/api/categories';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-	const categories = dummyData.categories.list();
+export const load: PageServerLoad = async ({ fetch }) => {
+	const categories = await categoriesApi.list(fetch);
 
 	return {
 		categories

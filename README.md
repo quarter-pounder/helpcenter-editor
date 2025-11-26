@@ -4,7 +4,7 @@ A simple help center content editor built with SvelteKit, featuring a markdown e
 
 ## Overview
 
-This is a sample/demo application showcasing a help center editor interface. The application includes:
+A help center content editor application with the following features:
 
 - **Rich text editing** with markdown support via carta-md
 - **Category management** for organizing guides
@@ -12,9 +12,14 @@ This is a sample/demo application showcasing a help center editor interface. The
 - **Dark mode** support
 - **Responsive design** with Tailwind CSS
 
-## Important Note
+## Configuration
 
-**The APIs and types in this project are legitimate and production-ready, tied to an actual backend**, but they are **not currently wired up** because this is a sample application. Instead, the application uses in-memory dummy data (`src/lib/stores/dummy-data.ts`) for demonstration purposes.
+The application connects to a backend API. Configure the API endpoint and editor key via environment variables:
+
+- `PUBLIC_API_URL` - Backend API URL (defaults to `http://localhost:8000`)
+- `PUBLIC_EDITOR_KEY` - Editor authentication key
+
+These can be set in a `.env` file or as environment variables.
 
 ## Tech Stack
 
@@ -62,11 +67,12 @@ pnpm preview
 ```
 src/
 ├── lib/
-│   ├── api/           # API client functions (ready to use, not wired up)
+│   ├── api/           # API client functions
 │   ├── components/    # Reusable UI components
-│   ├── stores/        # State management (includes dummy-data.ts)
+│   ├── stores/        # State management
 │   ├── theme/         # CSS theme files
 │   └── types/         # TypeScript type definitions (domain, DTOs, mappers)
 └── routes/            # SvelteKit routes
 ```
+
 

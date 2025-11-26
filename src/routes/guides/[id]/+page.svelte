@@ -1,15 +1,13 @@
 <script lang="ts">
-import type { PageData } from './$types';
+	import type { PageData } from './$types';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
-	import { dummyData } from '$lib/stores/dummy-data';
+	import { enhance } from '$app/forms';
 	import type { GuideBody } from '$lib/types/domain/guide';
 
-const { data } = $props<{ data: PageData }>();
+	const { data } = $props<{ data: PageData }>();
 
-	// domain guide from the server
 	const initialGuide = data.guide;
 
-	// local mutable state (Svelte 5 rune style)
 	let guide = $state(initialGuide);
 	let saving = $state(false);
 	let saveError: string | null = $state(null);
@@ -19,36 +17,6 @@ const { data } = $props<{ data: PageData }>();
 		if (!guide) return;
 		guide.body = body;
 		saveSuccess = false;
-	}
-
-	async function handleSave() {
-		if (!guide) return;
-
-		saving = true;
-		saveError = null;
-		saveSuccess = false;
-
-		try {
-			const updated = dummyData.guides.update(guide.id, {
-				title: guide.title,
-				slug: guide.slug,
-				body: guide.body,
-				estimatedReadTime: guide.estimatedReadTime,
-				categoryIds: guide.categoryIds,
-				mediaIds: guide.mediaIds
-			});
-
-			if (updated) {
-				guide = updated;
-				saveSuccess = true;
-			} else {
-				saveError = 'Failed to save guide';
-			}
-		} catch (e) {
-			saveError = e instanceof Error ? e.message : 'Failed to save guide';
-		} finally {
-			saving = false;
-		}
 	}
 </script>
 
@@ -73,14 +41,6 @@ const { data } = $props<{ data: PageData }>();
 				{#if saveSuccess}
 					<span class="text-sm text-emerald-600 dark:text-emerald-400">Saved</span>
 				{/if}
-				<button
-					type="button"
-					class="btn variant-filled-primary"
-					onclick={handleSave}
-					disabled={saving}
-				>
-					{saving ? 'Saving…' : 'Save'}
-				</button>
 			</div>
 		</div>
 
@@ -90,11 +50,33 @@ const { data } = $props<{ data: PageData }>();
 			</div>
 		{/if}
 
-		<div class="space-y-2">
+		<form
+			method="POST"
+			action="?/update"
+			class="space-y-2"
+			use:enhance={() => {
+				saving = true;
+				saveError = null;
+				saveSuccess = false;
+				return async ({ result, update }) => {
+					await update();
+					if (result.type === 'success') {
+						saveSuccess = true;
+						if (result.data?.guide) {
+							guide = result.data.guide;
+						}
+					} else if (result.type === 'failure') {
+						saveError = 'Failed to save guide';
+					}
+					saving = false;
+				};
+			}}
+		>
 			<div>
 				<label class="label" for="guide-title">Title</label>
 				<input
 					id="guide-title"
+					name="title"
 					class="input"
 					type="text"
 					bind:value={guide.title}
@@ -106,6 +88,7 @@ const { data } = $props<{ data: PageData }>();
 				<label class="label" for="guide-slug">Slug</label>
 				<input
 					id="guide-slug"
+					name="slug"
 					class="input"
 					type="text"
 					bind:value={guide.slug}
@@ -117,6 +100,7 @@ const { data } = $props<{ data: PageData }>();
 				<label class="label" for="guide-read-time">Estimated Read Time (minutes)</label>
 				<input
 					id="guide-read-time"
+					name="estimated_read_time"
 					class="input"
 					type="number"
 					min="1"
@@ -130,6 +114,20 @@ const { data } = $props<{ data: PageData }>();
 				<p class="label">Content</p>
 				<RichTextEditor value={guide.body} onUpdate={handleBodyChange} />
 			</div>
-		</div>
+
+			<input type="hidden" name="body" value={JSON.stringify(guide.body)} />
+			<input
+				type="hidden"
+				name="category_ids"
+				value={JSON.stringify(guide.categoryIds || [])}
+			/>
+			<input type="hidden" name="media_ids" value={JSON.stringify(guide.mediaIds || [])} />
+
+			<div class="flex gap-3 items-center pt-4">
+				<button type="submit" class="btn variant-filled-primary" disabled={saving}>
+					{saving ? 'Saving…' : 'Save'}
+				</button>
+			</div>
+		</form>
 	{/if}
 </div>
