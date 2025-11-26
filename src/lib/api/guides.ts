@@ -1,29 +1,42 @@
-import { apiClient } from './client';
-import type { Guide, GuideCreateDTO, GuideUpdateDTO } from '$lib/types/guide';
+import type { Guide } from '$lib/types/domain/guide';
+import type { GuideDTO, GuideCreateDTO, GuideUpdateDTO } from '$lib/types/dto/guide-dto';
+import { apiRequest } from './client';
+import { mapGuide } from '$lib/types/mappers/guide';
 
 export const guidesApi = {
-	list: async (categorySlug?: string): Promise<Guide[]> => {
-		const params = categorySlug ? `?category_slug=${categorySlug}` : '';
-		return apiClient.get<Guide[]>(`/guides${params}`);
+	list: async (fetchFn: typeof fetch, categorySlug?: string): Promise<Guide[]> => {
+		const q = categorySlug ? `?category_slug=${encodeURIComponent(categorySlug)}` : '';
+		const dtos = await apiRequest<GuideDTO[]>(fetchFn, `/guides${q}`);
+		return dtos.map(mapGuide);
 	},
 
-	get: async (id: string): Promise<Guide> => {
-		return apiClient.get<Guide>(`/guides/${id}`);
+	get: async (fetchFn: typeof fetch, id: string): Promise<Guide> => {
+		const dto = await apiRequest<GuideDTO>(fetchFn, `/guides/${id}`);
+		return mapGuide(dto);
 	},
 
-	getBySlug: async (slug: string): Promise<Guide> => {
-		return apiClient.get<Guide>(`/guides/slug/${slug}`);
+	getBySlug: async (fetchFn: typeof fetch, slug: string): Promise<Guide> => {
+		const dto = await apiRequest<GuideDTO>(fetchFn, `/guides/slug/${slug}`);
+		return mapGuide(dto);
 	},
 
-	create: async (payload: GuideCreateDTO): Promise<Guide> => {
-		return apiClient.post<Guide>('/guides', payload);
+	create: async (fetchFn: typeof fetch, payload: GuideCreateDTO): Promise<Guide> => {
+		const dto = await apiRequest<GuideDTO>(fetchFn, '/guides', {
+			method: 'POST',
+			body: JSON.stringify(payload)
+		});
+		return mapGuide(dto);
 	},
 
-	update: async (id: string, payload: GuideUpdateDTO): Promise<Guide> => {
-		return apiClient.put<Guide>(`/guides/${id}`, payload);
+	update: async (fetchFn: typeof fetch, id: string, payload: GuideUpdateDTO): Promise<Guide> => {
+		const dto = await apiRequest<GuideDTO>(fetchFn, `/guides/${id}`, {
+			method: 'PUT',
+			body: JSON.stringify(payload)
+		});
+		return mapGuide(dto);
 	},
 
-	delete: async (id: string): Promise<void> => {
-		await apiClient.delete(`/guides/${id}`);
-	},
+	delete: async (fetchFn: typeof fetch, id: string): Promise<void> => {
+		await apiRequest(fetchFn, `/guides/${id}`, { method: 'DELETE' });
+	}
 };

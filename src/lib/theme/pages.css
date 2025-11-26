@@ -1,0 +1,132 @@
+@reference "tailwindcss";
+
+/* ================================
+   HOME PAGE
+   ================================ */
+.home-hero {
+	@apply p-[clamp(2rem,5vw,3rem)] mb-8 text-left;
+}
+
+.home-hero__eyebrow {
+	@apply m-0 text-xs tracking-widest uppercase
+	text-gray-500 dark:text-slate-300;
+}
+
+.home-hero h1 {
+	@apply my-2 text-[clamp(2.25rem,5vw,3.25rem)]
+	text-gray-900 dark:text-slate-50;
+}
+
+.home-hero p {
+	@apply m-0 text-base max-w-[32rem]
+	text-gray-500 dark:text-slate-300;
+}
+
+.home-actions {
+	@apply grid gap-5;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.home-tile {
+	@apply p-7 flex items-center justify-between
+	no-underline text-inherit
+	rounded-lg transition-transform duration-200;
+}
+
+.home-tile h2 {
+	@apply m-0 text-xl
+	text-gray-900 dark:text-slate-50;
+}
+
+.home-tile p {
+	@apply mt-1.5 mb-0 text-gray-500 dark:text-slate-300 text-[0.95rem];
+}
+
+.home-tile span:last-child {
+	@apply text-2xl text-gray-500 dark:text-slate-300;
+}
+
+.home-tile:hover {
+	@apply -translate-y-1 shadow-xl;
+}
+
+/* ================================
+   CATEGORIES PAGE
+   ================================ */
+.categories {
+	@apply flex flex-col gap-6;
+}
+
+.categories__header {
+	@apply flex flex-wrap gap-4 items-center justify-between;
+}
+
+.categories__header h1 {
+	@apply m-0 text-[clamp(2rem,4vw,2.5rem)]
+	text-gray-900 dark:text-slate-50;
+}
+
+.categories__list {
+	@apply grid gap-4;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.categories__item {
+	@apply flex items-center justify-between
+	p-6
+	no-underline text-inherit
+	transition-transform duration-200;
+}
+
+.categories__item h2 {
+	@apply m-0 text-xl
+	text-gray-900 dark:text-slate-50;
+}
+
+.categories__item p {
+	@apply mt-1.5 mb-0 text-gray-500 dark:text-slate-300 text-[0.92rem];
+}
+
+.categories__item span {
+	@apply text-2xl text-gray-500 dark:text-slate-300;
+}
+
+.categories__item:hover {
+	@apply -translate-y-0.5 shadow-2xl;
+}
+
+@media (max-width: 640px) {
+	.categories__header {
+		@apply flex-col items-start;
+	}
+
+	.categories__item {
+		@apply p-5;
+	}
+}
+
+/* ================================
+   GUIDES PAGE
+   ================================ */
+.guides-page {
+	@apply flex flex-col gap-6;
+}
+
+.guides-page__header {
+	@apply flex flex-wrap gap-4 items-end justify-between;
+}
+
+.guides-page__header h1 {
+	@apply text-3xl font-semibold leading-tight mb-1
+	text-gray-900 dark:text-slate-50;
+}
+
+.guides-page__eyebrow {
+	@apply text-xs uppercase tracking-[0.3em]
+	text-gray-500 dark:text-slate-300 mb-1;
+}
+
+.guides-page__subtitle {
+	@apply text-gray-500 dark:text-slate-300 text-sm;
+}
+

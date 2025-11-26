@@ -1,16 +1,8 @@
 export interface Category {
 	id: string;
 	name: string;
-	description?: string;
+	description: string | null;
 	slug: string;
-	created_at: string;
-	updated_at: string;
+	createdAt: string;   // camelCase in domain
+	updatedAt: string;
 }
-
-export interface CategoryCreateDTO {
-	name: string;
-	description?: string;
-	slug: string;
-}
-
-export interface CategoryUpdateDTO extends Partial<CategoryCreateDTO> {}

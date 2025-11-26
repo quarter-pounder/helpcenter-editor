@@ -1,0 +1,12 @@
+@import '$lib/theme/fonts.css';
+@import '$lib/theme/globals.css';
+@import '$lib/theme/components.css';
+@import '$lib/theme/nav.css';
+@import 'carta-md/default.css';
+@import '$lib/theme/carta.css';
+@import '$lib/theme/category-select.css';
+@import '$lib/theme/pages.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

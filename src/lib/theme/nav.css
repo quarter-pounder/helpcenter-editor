@@ -1,0 +1,109 @@
+@reference "tailwindcss";
+
+/* ================================
+   TOP NAV WRAPPER
+   ================================ */
+.top-nav {
+    @apply absolute top-0 left-0 w-full z-20
+    bg-gray-300 dark:bg-slate-900
+    transition-transform duration-200;
+}
+
+.top-nav.hidden {
+    @apply -translate-y-full;
+}
+
+/* ================================
+   INNER LAYOUT
+   ================================ */
+.top-nav__inner {
+    @apply flex items-end gap-0
+    px-0;
+}
+
+/* ================================
+   LOGO
+   ================================ */
+.brand-chip {
+    @apply inline-flex items-center justify-center
+    w-[35px] h-[35px]
+    bg-transparent
+    text-gray-900 dark:text-slate-100
+    no-underline;
+}
+
+.brand-chip__icon :global(svg) {
+    @apply block;
+}
+
+/* ================================
+   THEME TOGGLE
+   ================================ */
+.theme-toggle {
+    @apply inline-flex items-center justify-center
+    w-[38px] h-[38px]
+    bg-transparent
+    text-gray-900 dark:text-slate-100
+    transition-all cursor-pointer;
+}
+
+.theme-toggle:hover {
+    @apply scale-110;
+}
+
+/* ================================
+   NAV TABS
+   ================================ */
+.nav-tabs {
+    @apply flex content-end gap-0 ml-4;
+}
+
+.nav-tabs a {
+    @apply relative inline-flex items-end
+    px-4 py-2
+    rounded-t-md
+    text-sm font-mono
+    border border-transparent border-b-0
+    text-gray-500 dark:text-slate-300
+    bg-gray-100 dark:bg-slate-900
+    transition-colors;
+}
+
+/* tiny bottom separator to mimic browser tab gap */
+.nav-tabs a::after {
+    @apply content-[''] absolute left-0 right-0 -bottom-px h-px
+    bg-transparent;
+}
+
+/* hover */
+.nav-tabs a:hover {
+    @apply text-gray-900 dark:text-slate-100;
+}
+
+/* active tab matches PAGE background */
+.nav-tabs a.active {
+    @apply text-gray-900 dark:text-slate-100
+    bg-gray-50 dark:bg-slate-950     /* match page bg */
+    border-gray-300 dark:border-slate-700;
+}
+
+.nav-tabs a.active::after {
+    @apply bg-gray-50 dark:bg-slate-950;
+}
+
+/* ================================
+   RESPONSIVE
+   ================================ */
+@media (max-width: 768px) {
+    .top-nav__inner {
+        @apply flex-wrap gap-3;
+    }
+
+    .nav-tabs {
+        @apply w-full justify-start ml-0 order-3;
+    }
+
+    .nav-tabs a {
+        @apply min-w-0;
+    }
+}

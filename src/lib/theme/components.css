@@ -1,0 +1,133 @@
+@reference "tailwindcss";
+
+/* ================================
+   CARD
+   ================================ */
+.card {
+	@apply bg-white dark:bg-slate-900
+	border border-gray-200 dark:border-slate-800
+	rounded-lg
+	shadow-lg dark:shadow-slate-950/50
+	text-gray-900 dark:text-slate-50;
+}
+
+/* ================================
+   INPUTS & LABELS
+   ================================ */
+.input {
+	@apply w-full px-4 py-3 rounded-xl
+	border border-gray-300 dark:border-slate-700
+	bg-white dark:bg-slate-900
+	text-gray-900 dark:text-slate-100
+	placeholder-gray-400 dark:placeholder-slate-500
+	shadow-sm
+	transition-colors duration-150;
+}
+
+.input option {
+	@apply text-gray-900 dark:text-slate-100
+	bg-white dark:bg-slate-900;
+}
+
+.input:focus {
+	@apply outline-none
+	ring-2 ring-blue-300 dark:ring-amber-600
+	border-transparent;
+}
+
+.label {
+	@apply block text-sm font-medium mb-2
+	text-gray-700 dark:text-slate-300;
+}
+
+.form-hint {
+	@apply text-xs text-surface-500 mt-1;
+}
+
+/* ================================
+   BUTTONS
+   ================================ */
+.btn {
+	@apply inline-flex items-center justify-center
+	gap-1.5 rounded-full
+	px-5 py-2.5 font-medium
+	border border-transparent
+	cursor-pointer select-none
+	transition-all duration-150
+	no-underline;
+}
+
+.btn:disabled {
+	@apply cursor-not-allowed opacity-60;
+}
+
+.btn.variant-filled-primary {
+	@apply bg-slate-900 dark:bg-blue-400
+		rounded-sm
+	text-white dark:text-slate-900
+	shadow-md dark:shadow-blue-900/40;
+}
+
+.btn.variant-filled-primary:hover:not(:disabled) {
+	@apply -translate-y-0.5;
+}
+
+.btn.variant-ghost {
+	@apply border border-gray-300 dark:border-slate-700
+	bg-transparent
+	text-gray-900 dark:text-slate-100;
+}
+
+/* ================================
+   ALERTS
+   ================================ */
+.alert {
+	@apply rounded-lg px-4 py-3 text-sm;
+}
+
+.alert.variant-soft-error {
+	@apply bg-red-100 dark:bg-red-900/30
+	text-red-800 dark:text-red-400;
+}
+
+/* ================================
+   PAGE WRAPPERS
+   ================================ */
+.page-container {
+	@apply max-w-4xl mx-auto px-6 py-10;
+}
+
+.page-header {
+	@apply mb-10;
+}
+
+.page-title {
+	@apply text-3xl font-semibold;
+}
+
+.page-section {
+	@apply flex flex-col gap-6;
+}
+
+/* ================================
+   SURFACE TOKENS
+   ================================ */
+.text-surface-600 {
+	@apply text-gray-600 dark:text-slate-300;
+}
+
+.text-surface-500 {
+	@apply text-gray-500 dark:text-slate-300;
+}
+
+.text-surface-400 {
+	@apply text-gray-400 dark:text-slate-400;
+}
+
+.bg-surface-100 {
+	@apply bg-gray-100 dark:bg-slate-900;
+}
+
+.border-surface-300 {
+	@apply border-gray-300 dark:border-slate-700;
+}

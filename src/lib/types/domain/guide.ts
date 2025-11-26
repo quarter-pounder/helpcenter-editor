@@ -14,20 +14,9 @@ export interface Guide {
 	title: string;
 	slug: string;
 	body: GuideBody;
-	estimated_read_time: number;
-	category_ids: string[];
-	media_ids: string[];
-	created_at: string;
-	updated_at: string;
+	estimatedReadTime: number;
+	categoryIds: string[];
+	mediaIds: string[];
+	createdAt: string;
+	updatedAt: string;
 }
-
-export interface GuideCreateDTO {
-	title: string;
-	slug: string;
-	body: GuideBody;
-	estimated_read_time: number;
-	category_ids?: string[];
-	media_ids?: string[];
-}
-
-export interface GuideUpdateDTO extends Partial<GuideCreateDTO> {}

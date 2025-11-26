@@ -1,0 +1,68 @@
+@reference "tailwindcss";
+
+/* Wrapper */
+.carta-editor {
+	@apply flex flex-col gap-0 bg-transparent;
+}
+
+/* Toolbar */
+.carta-editor .carta-toolbar button {
+	@apply p-1.5 rounded-md
+    text-slate-600 dark:text-slate-300
+    hover:text-slate-900 dark:hover:text-slate-100
+    hover:bg-slate-200/60 dark:hover:bg-slate-700/60;
+}
+
+/* Tabs */
+.carta-editor .carta-tabs {
+	@apply flex gap-4 text-sm mb-1;
+}
+
+.carta-editor .carta-tab {
+	@apply text-slate-500 dark:text-slate-400 cursor-pointer pb-2;
+}
+
+.carta-editor .carta-tab.active {
+	@apply text-slate-900 dark:text-slate-100 font-medium;
+}
+
+.carta-editor .carta-tab.active::after {
+	content: '';
+	@apply block w-full h-[2px] bg-current mt-1 rounded-md;
+}
+
+/* Input (Notion-like) */
+.carta-editor .carta-input textarea {
+	@apply bg-transparent w-full leading-relaxed
+    text-slate-900 dark:text-slate-100
+    placeholder-slate-400 dark:placeholder-slate-500
+    outline-none resize-none;
+	position: relative;
+	z-index: 1;
+	caret-color: rgb(15 23 42);
+}
+
+.dark .carta-editor .carta-input textarea {
+	caret-color: rgb(241 245 249);
+}
+
+.carta-editor .carta-input textarea::selection {
+	background-color: rgb(191 219 254);
+	color: rgb(15 23 42);
+}
+
+.dark .carta-editor .carta-input textarea::selection {
+	background-color: rgba(30, 58, 138, 0.5);
+	color: rgb(241 245 249);
+}
+
+/* Hide highlight only in input mode */
+.carta-editor .carta-input .carta-highlight {
+	opacity: 0 !important;
+	pointer-events: none;
+}
+
+/* Preview stays fully default (Shiki applied automatically) */
+.carta-editor .carta-renderer {
+	@apply prose prose-slate dark:prose-invert max-w-none;
+}
