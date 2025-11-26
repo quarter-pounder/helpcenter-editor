@@ -5,9 +5,11 @@ export default {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({
+			strict: false
+		}),
 		prerender: {
-			entries: ['*']
+			entries: []
 		},
 		alias: {
 			$lib: 'src/lib',
