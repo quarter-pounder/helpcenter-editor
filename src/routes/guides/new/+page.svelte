@@ -24,6 +24,7 @@
 	let error: string | null = $state(null);
 	let slugManuallyEdited = $state(false);
 	let editorMarkdown = $state('');
+	let bodyInputValue = $derived(() => JSON.stringify(formData.body));
 
 	function generateSlug(title: string): string {
 		return title
@@ -65,8 +66,6 @@
 		formData.body = currentBody;
 		return true;
 	}
-
-	let bodyInputValue = $derived(JSON.stringify(formData.body));
 </script>
 
 <svelte:head>

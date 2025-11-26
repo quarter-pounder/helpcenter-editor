@@ -3,6 +3,7 @@
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import { enhance } from '$app/forms';
 	import type { GuideBody } from '$lib/types/domain/guide';
+	import { blocksToMarkdown, markdownToBlocks } from '$lib/editor/convert';
 
 	const { data } = $props<{ data: PageData }>();
 
@@ -12,11 +13,68 @@
 	let saving = $state(false);
 	let saveError: string | null = $state(null);
 	let saveSuccess = $state(false);
+	let editorMarkdown = $state('');
+	let lastGuideBodyKey = $state('');
+	let bodyInputValue = $derived(() => JSON.stringify(guide?.body ?? { blocks: [] }));
+
+	$effect(() => {
+		const body = guide?.body ?? { blocks: [] };
+		const key = JSON.stringify(body);
+		if (key !== lastGuideBodyKey) {
+			lastGuideBodyKey = key;
+			editorMarkdown = blocksToMarkdown(body);
+		}
+	});
 
 	function handleBodyChange(body: GuideBody) {
 		if (!guide) return;
 		guide.body = body;
 		saveSuccess = false;
+	}
+
+	function handleMarkdownChange(markdown: string) {
+		editorMarkdown = markdown;
+		saveSuccess = false;
+	}
+
+	function handleEnhance({ cancel }: { cancel: () => void }) {
+		if (!guide) {
+			cancel();
+			return;
+		}
+		const currentBody = markdownToBlocks(editorMarkdown || '');
+		if (!currentBody.blocks || currentBody.blocks.length === 0) {
+			saveError =
+				'Content cannot be empty. Please add at least one paragraph, heading, or list.';
+			saveSuccess = false;
+			cancel();
+			return;
+		}
+		guide.body = currentBody;
+		saving = true;
+		saveError = null;
+		saveSuccess = false;
+		return async ({
+			result,
+			update
+		}: {
+			result:
+				| { type: 'success'; data?: { guide?: typeof guide } }
+				| { type: 'failure'; data?: { error?: string } }
+				| { type: 'redirect' };
+			update: () => Promise<void>;
+		}) => {
+			await update();
+			if (result.type === 'success') {
+				saveSuccess = true;
+				if (result.data?.guide) {
+					guide = result.data.guide;
+				}
+			} else if (result.type === 'failure') {
+				saveError = result.data?.error || 'Failed to save guide';
+			}
+			saving = false;
+		};
 	}
 </script>
 
@@ -54,23 +112,7 @@
 			method="POST"
 			action="?/update"
 			class="space-y-2"
-			use:enhance={() => {
-				saving = true;
-				saveError = null;
-				saveSuccess = false;
-				return async ({ result, update }) => {
-					await update();
-					if (result.type === 'success') {
-						saveSuccess = true;
-						if (result.data?.guide) {
-							guide = result.data.guide;
-						}
-					} else if (result.type === 'failure') {
-						saveError = 'Failed to save guide';
-					}
-					saving = false;
-				};
-			}}
+			use:enhance={handleEnhance}
 		>
 			<div>
 				<label class="label" for="guide-title">Title</label>
@@ -112,10 +154,15 @@
 
 			<div>
 				<p class="label">Content</p>
-				<RichTextEditor value={guide.body} onUpdate={handleBodyChange} />
+				<RichTextEditor
+					value={guide.body}
+					onUpdate={handleBodyChange}
+					onMarkdownChange={handleMarkdownChange}
+				/>
 			</div>
 
-			<input type="hidden" name="body" value={JSON.stringify(guide.body)} />
+			<input type="hidden" name="body" value={bodyInputValue} />
+			<input type="hidden" name="editor_markdown" value={editorMarkdown} />
 			<input
 				type="hidden"
 				name="category_ids"

@@ -3,6 +3,7 @@ import { guidesApi } from '$lib/api/guides';
 import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { resolvePath } from '$lib/utils/navigation';
+import { markdownToBlocks } from '$lib/editor/convert';
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	const categories = await categoriesApi.list(fetch);
@@ -15,25 +16,22 @@ export const actions: Actions = {
 
 		const title = form.get('title') as string;
 		const slug = form.get('slug') as string;
-		const bodyStr = form.get('body') as string;
-		const editorMarkdown = form.get('editor_markdown') as string;
+		const bodyStr = (form.get('body') as string) || '';
+		const editorMarkdown = (form.get('editor_markdown') as string) || '';
 		const estimated_read_time = Number(form.get('estimated_read_time'));
 		const category_ids = JSON.parse((form.get('category_ids') as string) || '[]');
 		const media_ids = JSON.parse((form.get('media_ids') as string) || '[]');
 
 		let body;
 		try {
-			body = JSON.parse(bodyStr);
+			body = bodyStr ? JSON.parse(bodyStr) : null;
 		} catch {
-			return { error: 'Invalid body data' };
+			body = null;
 		}
 
 		if (!body?.blocks || body.blocks.length === 0) {
-			if (editorMarkdown) {
-				const { markdownToBlocks } = await import('$lib/editor/convert');
-				body = markdownToBlocks(editorMarkdown);
-			}
-			if (!body?.blocks || body.blocks.length === 0) {
+			body = markdownToBlocks(editorMarkdown);
+			if (!body.blocks || body.blocks.length === 0) {
 				return {
 					error: 'Content cannot be empty. Please add at least one paragraph, heading, or list.'
 				};
